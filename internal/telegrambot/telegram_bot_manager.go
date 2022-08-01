@@ -50,8 +50,11 @@ func ManageTelegramBot(config configs.TelegramConfig) {
 						mailData[0],
 						mailData[1],
 						mailData[2],
-					}, bot, update)
-
+					})
+				case Filters:
+					us.Filter(strings.Split(update.Message.Text, ", "))
+				case Listen:
+					us.Listen(bot, update)
 				}
 			} else {
 				if update.Message.Text == InitCommand {

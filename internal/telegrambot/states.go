@@ -6,6 +6,7 @@ import (
 	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"log"
+	"strings"
 )
 
 type State string
@@ -17,8 +18,9 @@ const (
 )
 
 type UserState struct {
-	State State
-	mail  services.ConsumerService
+	State   State
+	mail    services.ConsumerService
+	filters []Filter
 }
 
 func NewUserState() *UserState {
@@ -27,24 +29,48 @@ func NewUserState() *UserState {
 	}
 }
 
-func (u *UserState) Connect(config configs.PostConfig, bot *tgbotapi.BotAPI, update tgbotapi.Update) {
+func (u *UserState) Connect(config configs.PostConfig) {
 	c := services.NewPostService(config)
 	u.mail = c
-	h := &telegramHandler{Bot: bot, Update: update}
-	go c.Listen(h)
+	u.State = Filters
+}
+
+func (u *UserState) Filter(addrs []string) {
+	filters := make([]Filter, 0)
+	for _, addr := range addrs {
+		filters = append(filters, Filter{Addr: addr})
+	}
+	u.filters = filters
 	u.State = Listen
 }
 
+func (u *UserState) Listen(bot *tgbotapi.BotAPI, update tgbotapi.Update) {
+	h := &telegramHandler{Bot: bot, Update: update, filters: u.filters}
+	go u.mail.Listen(h)
+}
+
 type telegramHandler struct {
-	Bot    *tgbotapi.BotAPI
-	Update tgbotapi.Update
+	Bot     *tgbotapi.BotAPI
+	Update  tgbotapi.Update
+	filters []Filter
 }
 
 func (t *telegramHandler) Handle(message services.PostMessage) {
-	msg := tgbotapi.NewMessage(t.Update.Message.Chat.ID, fmt.Sprintf("Mail: \n %s \n %s", message.MailAddr,
-		message.Subject))
-	msg.ReplyToMessageID = t.Update.Message.MessageID
-	if _, err := t.Bot.Send(msg); err != nil {
-		log.Println(err)
+	if t.containMails(message.MailAddr) {
+		msg := tgbotapi.NewMessage(t.Update.Message.Chat.ID, fmt.Sprintf("Mail: \n %s \n %s", message.MailAddr,
+			message.Subject))
+		msg.ReplyToMessageID = t.Update.Message.MessageID
+		if _, err := t.Bot.Send(msg); err != nil {
+			log.Println(err)
+		}
 	}
+}
+
+func (t *telegramHandler) containMails(mails string) bool {
+	for _, f := range t.filters {
+		if strings.Contains(mails, f.Addr) {
+			return true
+		}
+	}
+	return false
 }
