@@ -52,11 +52,15 @@ func ManageTelegramBot(config configs.TelegramConfig) {
 						mailData[1],
 						mailData[2],
 					})
-					sendMsg("Expecting emails addresses ", bot, update)
+					sendMsg("Expecting emails addresses in format: addr1@mail.com, addr2@mail.com, ...", bot, update)
 				case Filters:
-
-					us.Filter(strings.Split(update.Message.Text, ", "))
-					sendMsg("Filters are created, expecting /listen command", bot, update)
+					addrs := strings.Split(update.Message.Text, ", ")
+					if len(addrs) != 0 {
+						us.Filter(addrs)
+						sendMsg("Filters are created, expecting /listen command", bot, update)
+					} else {
+						sendMsg("Expecting emails addresses in format: addr1@mail.com, addr2@mail.com, ...", bot, update)
+					}
 				case Listen:
 					if update.Message.Text == ListenCommand {
 						us.Listen(bot, update)
