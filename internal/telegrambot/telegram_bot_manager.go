@@ -51,17 +51,20 @@ func ManageTelegramBot(config configs.TelegramConfig) {
 						mailData[1],
 						mailData[2],
 					})
+					sendMsg("Expecting emails addresses ", bot, update)
 				case Filters:
 					us.Filter(strings.Split(update.Message.Text, ", "))
+					sendMsg("Filters are created, expecting /listen command", bot, update)
 				case Listen:
 					us.Listen(bot, update)
+					sendMsg("Now your mail is listening", bot, update)
 				}
 			} else {
 				if update.Message.Text == InitCommand {
 					lp.pool[update.Message.From.ID] = NewUserState()
-					sendMsg("Ожидаю данные почты в формате: адрес, логин, пароль", bot, update)
+					sendMsg("Expecting mail address in format: address, login, password", bot, update)
 				} else {
-					sendMsg("Необходимо вызвать "+InitCommand, bot, update)
+					sendMsg("In's need to be executed "+InitCommand, bot, update)
 				}
 			}
 			lp.mutex.Unlock()

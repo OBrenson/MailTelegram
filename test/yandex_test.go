@@ -2,6 +2,7 @@ package a_test
 
 import (
 	"YadnexTelegram/internal/services"
+	"YadnexTelegram/internal/util"
 	"testing"
 )
 
@@ -9,7 +10,7 @@ var test *testing.T
 
 func TestPost(t *testing.T) {
 	test = t
-	p := GetPostConfig("./resources/configs.yaml")
+	p := util.GetPostConfig("./resources/configs.yaml")
 	y := services.NewPostService(p).(services.ConsumerService)
 	err := y.Listen(&HandlerMock{})
 	if err != nil {

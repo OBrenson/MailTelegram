@@ -59,7 +59,6 @@ func (t *telegramHandler) Handle(message services.PostMessage) {
 	if t.containMails(message.MailAddr) {
 		msg := tgbotapi.NewMessage(t.Update.Message.Chat.ID, fmt.Sprintf("Mail: \n %s \n %s", message.MailAddr,
 			message.Subject))
-		msg.ReplyToMessageID = t.Update.Message.MessageID
 		if _, err := t.Bot.Send(msg); err != nil {
 			log.Println(err)
 		}
