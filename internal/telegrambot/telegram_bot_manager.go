@@ -13,7 +13,8 @@ type TelegramInitService struct {
 }
 
 const (
-	InitCommand string = "/connectmail"
+	InitCommand   string = "/connectmail"
+	ListenCommand        = "/listen"
 )
 
 type lockingPool struct {
@@ -53,11 +54,14 @@ func ManageTelegramBot(config configs.TelegramConfig) {
 					})
 					sendMsg("Expecting emails addresses ", bot, update)
 				case Filters:
+
 					us.Filter(strings.Split(update.Message.Text, ", "))
 					sendMsg("Filters are created, expecting /listen command", bot, update)
 				case Listen:
-					us.Listen(bot, update)
-					sendMsg("Now your mail is listening", bot, update)
+					if update.Message.Text == ListenCommand {
+						us.Listen(bot, update)
+						sendMsg("Now your mail is listening", bot, update)
+					}
 				}
 			} else {
 				if update.Message.Text == InitCommand {
@@ -74,7 +78,6 @@ func ManageTelegramBot(config configs.TelegramConfig) {
 
 func sendMsg(mes string, bot *tgbotapi.BotAPI, update tgbotapi.Update) {
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, mes)
-	msg.ReplyToMessageID = update.Message.MessageID
 	if _, err := bot.Send(msg); err != nil {
 		log.Println(err)
 	}
