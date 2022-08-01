@@ -12,6 +12,10 @@ import (
 func TestConfParsing(t *testing.T) {
 	p := GetPostConfig("./resources/configs.yaml")
 	fmt.Println(p)
+
+	tel := GetTelConfig("./resources/configs.yaml")
+	fmt.Println(tel)
+
 }
 func GetPostConfig(postConfPath string) configs.PostConfig {
 	c := parseRawData(postConfPath)["config"]
@@ -19,6 +23,13 @@ func GetPostConfig(postConfPath string) configs.PostConfig {
 		Addr:  c["addr"],
 		Login: c["login"],
 		Pass:  c["pass"],
+	}
+}
+
+func GetTelConfig(path string) configs.TelegramConfig {
+	c := parseRawData(path)["config"]
+	return configs.TelegramConfig{
+		BotName: c["token"],
 	}
 }
 

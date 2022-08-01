@@ -14,7 +14,6 @@ type ProducerMessage struct {
 
 type MessageHandler interface {
 	Handle(message PostMessage)
-	ProducerService
 }
 
 type ResourceService interface {
@@ -24,11 +23,6 @@ type ResourceService interface {
 type ConsumerService interface {
 	ResourceService
 	Listen(handler MessageHandler) error
-}
-
-type ProducerService interface {
-	ResourceService
-	Produce(message ProducerMessage) error
 }
 
 func NewPostService(config configs.PostConfig) ConsumerService {

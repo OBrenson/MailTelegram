@@ -5,3 +5,7 @@ type PostConfig struct {
 	Login string
 	Pass  string
 }
+
+type TelegramConfig struct {
+	BotName string
+}
