@@ -13,6 +13,7 @@ type PostConsumer struct {
 	config     configs.PostConfig
 }
 
+//Connecting with mail.
 func (y *PostConsumer) Connect() error {
 	var err error
 	y.imapClient, err = client.DialTLS(y.config.Addr, nil)
@@ -26,6 +27,7 @@ func (y *PostConsumer) Connect() error {
 	return nil
 }
 
+//Listen for INBOX updates. Need to reconnect after idle stop.
 func (y *PostConsumer) Listen(handler MessageHandler) error {
 	for {
 		err := y.Connect()

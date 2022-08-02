@@ -7,6 +7,7 @@ import (
 	"os"
 )
 
+//Load configs from yaml file
 func GetPostConfig(postConfPath string) configs.PostConfig {
 	c := parseRawData(postConfPath)["config"]
 	return configs.PostConfig{

@@ -9,6 +9,7 @@ import (
 
 type State string
 
+//States enum
 const (
 	Connect State = State(InitCommand)
 	Filters State = "filters"
@@ -27,12 +28,14 @@ func NewUserState() *UserState {
 	}
 }
 
+//Prepare UserState for connecting with mail
 func (u *UserState) Connect(config configs.PostConfig) {
 	c := services.NewPostService(config)
 	u.mail = c
 	u.State = Filters
 }
 
+//Adding mail filters
 func (u *UserState) Filter(addrs []string) {
 	filters := make([]Filter, 0)
 	for _, addr := range addrs {
@@ -42,6 +45,7 @@ func (u *UserState) Filter(addrs []string) {
 	u.State = Listen
 }
 
+//Start listening
 func (u *UserState) Listen(chatId int64, msgQue *chan botMsg) {
 	h := &telegramHandler{chatId: chatId, msgQue: msgQue, filters: u.filters}
 	go u.mail.Listen(h)

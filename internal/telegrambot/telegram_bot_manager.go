@@ -8,25 +8,25 @@ import (
 	"sync"
 )
 
-type TelegramInitService struct {
-	Config configs.TelegramConfig
-}
-
+//Instructions set
 const (
 	InitCommand   string = "/connectmail"
 	ListenCommand        = "/listen"
 )
 
+//Synchronized pool of users' states
 type lockingPool struct {
 	pool  map[int64]*UserState
 	mutex sync.Mutex
 }
 
+//Message sending in telegram bot
 type botMsg struct {
 	chatId int64
 	msg    string
 }
 
+// The main method that rules users states, mail listeners and messages sending
 func ManageTelegramBot(config configs.TelegramConfig) {
 	bot, err := tgbotapi.NewBotAPI(config.BotName)
 	if err != nil {
@@ -94,6 +94,7 @@ func ManageTelegramBot(config configs.TelegramConfig) {
 	}
 }
 
+//Synchronized messages sending through channel
 func sendMsg(bot *tgbotapi.BotAPI, msgQue chan botMsg) {
 	for bm := range msgQue {
 		msg := tgbotapi.NewMessage(bm.chatId, bm.msg)

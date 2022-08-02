@@ -9,19 +9,12 @@ type PostMessage struct {
 	Subject  string
 }
 
-type ProducerMessage struct {
-}
-
 type MessageHandler interface {
 	Handle(message PostMessage)
 }
 
-type ResourceService interface {
-	Connect() error
-}
-
 type ConsumerService interface {
-	ResourceService
+	Connect() error
 	Listen(handler MessageHandler) error
 }
 
